@@ -55,10 +55,13 @@ class Ui_MainWindow(object):
         self.actionMainIndividual.setObjectName("mainIndividualAction")
         self.actionPareto = QtGui.QAction(MainWindow)
         self.actionPareto.setObjectName("actionPareto")
+        self.actionIdealPoint = QtGui.QAction(MainWindow)
+        self.actionIdealPoint.setObjectName("actionIdealPoint")
         self.menuCriterias.addAction(self.actionAdditive)
         self.menuCriterias.addAction(self.actionMultiplicative)
         self.menuCriterias.addAction(self.actionKobbDouglas)
         self.menuCriterias.addAction(self.actionMainIndividual)
+        self.menuCriterias.addAction(self.actionIdealPoint)
         self.menuCriterias.addAction(self.actionPareto)
         self.menubar.addAction(self.menuCriterias.menuAction())
 
@@ -75,5 +78,6 @@ class Ui_MainWindow(object):
         self.actionMultiplicative.setText(QtGui.QApplication.translate("MainWindow", "Multiplicative", None, QtGui.QApplication.UnicodeUTF8))
         self.actionKobbDouglas.setText(QtGui.QApplication.translate("MainWindow", "Kobb-Douglas", None, QtGui.QApplication.UnicodeUTF8))
         self.actionMainIndividual.setText(QtGui.QApplication.translate("MainWindow", "Main Individual", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionIdealPoint.setText(QtGui.QApplication.translate("MainWindow", "Ideal Point", None, QtGui.QApplication.UnicodeUTF8))
         self.actionPareto.setText(QtGui.QApplication.translate("MainWindow", "Pareto", None, QtGui.QApplication.UnicodeUTF8))
 

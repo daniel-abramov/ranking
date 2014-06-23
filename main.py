@@ -13,7 +13,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.prioritiesEdit.setText("1.0 1.0 1.0")
 
-        self.priorities = [1.0, 1.0, 1.0]
+        self.priorities = np.array([1.0, 1.0, 1.0])
         self.alternatives = np.array([
             [0.1, 10, 350],
             [1.3, 15, 250],
@@ -30,11 +30,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionKobbDouglas.triggered.connect(self.kobb_douglas)
         self.actionMainIndividual.triggered.connect(self.individual)
         self.actionPareto.triggered.connect(self.pareto)
+        self.actionIdealPoint.triggered.connect(self.idealPoint)
 
     def prepare_calculations(self):
         self.parse_priorities()
         self.normalize_priorities()
         self.f0 = []
+
+    def idealPoint(self):
+        self.prepare_calculations()
+        ideal_point = np.max(self.alternatives, axis = 0)
+        for row in self.alternatives:
+            distance = np.sum(self.priorities * ((ideal_point - row)) ** 2.0) ** 0.5
+            self.f0.append(distance)
+        self.display_f0()
 
     def pareto(self):
         dimensions = ( len(self.alternatives), len(self.alternatives) )
@@ -85,9 +94,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def multiplicative(self):
         self.prepare_calculations()
         for row in self.alternatives:
-            mul = 1.0
-            for i in range(len(self.priorities)):
-                mul *= self.priorities[i] * row[i]
+            mul = np.product(self.priorities * row)
             self.f0.append(mul)
         self.display_f0()
 
@@ -99,22 +106,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.display_f0()
 
     def normalize_priorities(self):
-        if sum(self.priorities) == 0:
-            return
-        self.priorities = list(map(lambda x: x / sum(self.priorities), self.priorities))
+        priorities_sum = np.sum(self.priorities)
+        if priorities_sum != 0:
+            self.priorities /= np.sum(self.priorities)
 
     def display_f0(self):
         last_column = self.tableWidget.columnCount() - 1
         for i, value in enumerate(self.f0):
             self.tableWidget.setItem(i, last_column, QTableWidgetItem(str(value)))
         self.tableWidget.setHorizontalHeaderItem(last_column, QTableWidgetItem("f0"))
+        # self.tableWidget.sortItems(last_column)
 
     def normalize(self):
-        (rows, columns) = self.alternatives.shape
-        for i in range(columns):
-            column = self.alternatives[:, i]
-            column = (column - column.min()) / (column.max() - column.min())
-            self.alternatives[:, i] = column
+        self.alternatives = ((self.alternatives - self.alternatives.min(axis=1)) /
+                (self.alternatives.max(axis=1) - self.alternatives.min(axis=1)))
         self.update_table()
 
     def update_table(self):
@@ -133,7 +138,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         values = text.split(' ')
         if len(values) != 3:
             raise IOError()
-        self.priorities = [float(x) for x in values]
+        self.priorities = np.array([float(x) for x in values])
 
 
 app = QApplication(sys.argv)
